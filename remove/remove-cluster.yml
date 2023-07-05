@@ -1,0 +1,25 @@
+---
+- hosts: localhost
+  connection: local
+  tasks:
+    - name: Remove Service
+      kubernetes.core.k8s:
+        state: absent
+        api_version: v1
+        kind: Service
+        namespace: default
+        name: ansible-monitoring
+    - name: Remove Deployment
+      kubernetes.core.k8s:
+        state: absent
+        api_version: v1
+        kind: Deployment
+        namespace: default
+        name: ansible-monitoring
+    - name: Remove ServiceMonitor
+      kubernetes.core.k8s:
+        state: absent
+        api_version: v1
+        kind: ServiceMonitor
+        namespace: monitoring
+        name: ansible-monitoring
