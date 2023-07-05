@@ -1,0 +1,8 @@
+---
+- hosts: localhost
+  connection: local
+  tasks:
+    - name: Deploy a Cluster
+      kubernetes.core.k8s:
+        state: present
+        src: kubernetes/ansible-monitoring.yaml

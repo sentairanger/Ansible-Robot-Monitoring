@@ -1,0 +1,17 @@
+---
+- hosts: localhost
+  connection: local
+  tasks:
+    - name: Ensure Docker image is built from the test Dockerfile.
+      docker_image:
+        name: ansible-monitoring
+        source: build
+        build:
+          path: test
+        state: present
+    - name: Ensure the test container is running.
+      docker_container:
+        image: ansible-monitoring:latest
+        name: ansible-monitoring
+        state: started
+        ports: "5000:5000"
