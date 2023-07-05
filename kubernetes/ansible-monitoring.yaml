@@ -1,0 +1,68 @@
+apiVersion: v1
+kind: Deployment
+metadata:
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/path: /metrics
+    prometheus.io/port: roboport
+  labels:
+    name: ansible-monitoring
+    release: prometheus
+  name: ansible-monitoring
+  namespace: default
+spec:
+  replicas: 1 
+  selector:
+    matchLabels:
+      app: ansible-monitoring
+  template:
+    metadata:
+      labels:
+        app: ansible-monitoring
+    spec:
+      containers:
+      - name: ansible-monitoring
+        image: linuxrobotgeek/ansible-monitoring:latest
+        imagePullPolicy: Always
+        ports:
+        - name: roboport
+          containerPort: 5000
+          protocol: TCP
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ansible-monitoring
+  namespace: default
+  labels:
+    app: ansible-monitoring
+spec:
+  selector:
+    app: ansible-monitoring
+  ports:
+    - name: ansible-monitoring
+      protocol: TCP
+      port: 5000
+      targetPort: roboport
+  type: LoadBalancer
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: ansible-monitoring
+  namespace: monitoring
+  labels:
+    app: ansible-monitoring
+    release: prometheus
+spec:
+  selector:
+    matchLabels:
+      app: ansible-monitoring
+  endpoints:
+  - port: ansible-monitoring
+    path: /metrics
+    interval: 15s
+  namespaceSelector:
+    matchNames:
+    - default
